@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+<!-- 
+Example for Wix3. 
+By this template WxiGen will generate two component groups CGroup.Folder1 and CGroup.Folder2.
+Each component group content full directory tree (files and directories)
+-->
+
+<Fragment  Id="Fragment.WebFolders" Prefix="wfl">
+
+	<TDirectoryRef Id="Dir.Folder1Root" ComponentGroupId="CGroup.Folder1">
+		
+		<TDirectoryTree 
+					 Id="Dir.Folder1" 
+					 SourceDir="${BinariesRoot}\_PublishedWebsites\Folder1" 
+					 Name="." 
+					 ComponentId="CM.Folder1"
+					 Guid="03A531A9-AFB3-4A6A-801D-3A0BF3039102">
+		</TDirectoryTree>
+
+	</TDirectoryRef>
+
+
+	<TDirectoryRef Id="Dir.Folder2Root" ComponentGroupId="CGroup.Folder2">
+		
+		<TDirectoryTree 
+					 Id="Dir.Folder2" 
+					 SourceDir="${BinariesRoot}\_PublishedWebsites\Folder2" 
+					 Name="." 
+					 ComponentId="CM.Folder2"
+					 Guid="123123123AFB3-4FFA-E01D-3A0BF3042500">
+		</TDirectoryTree>
+
+	</TDirectoryRef>
+
+</Fragment>
+</Wix>

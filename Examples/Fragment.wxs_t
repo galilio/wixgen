@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
+
+<!-- 
+	Fragment - WiX fragment
+		Атрибуты:
+			Prefix - Уникальный (в рамках продукта) префикс для формирования коротких имён файлов/каталогов.
+					 Должен состоять из трёх символов/цифр.
+
+	TDirectoryRef - Ссылка на каталог (DirectoryRef) другого wxs файла, а так же определенеие имени группы компонентов (ComponentGroup)
+		Attributes:
+			Id - ID каталога, на который сылается данный элемент (См. wixdoc DirectoryRef.Id)
+			ComponentGroupId - ID группы комонентов, которая будет сгенерирована (См. wixdoc ComponentGroup.Id)
+
+	TIncludeComponent - Включение компоненты в группу компонент (группа задаётся в TDirectoryRef)
+	
+	TDirectory - Определение каталога для генерации
+		Attributes:
+			Id - ID каталога (Directory.Id)
+			Name - Длинное имя для сгенерированного каталога (Directory.LongName)
+			ComponentId - ID компонента, который будет включён в каталог (Component.Id)
+			Guid - GUID компонента (Component.Guid)
+
+	Inline - Внедрение WiX кода. Содержимое тэга 'Inline' поместится без изменений в генерируемый wxs файл.
+	
+	TFiles - Определение списка файлов, которые будут входить в сгенерированный каталог/компонент
+		Атрибуты:
+			Source - Исходный каталог, откуда брать файлы
+			DiskId, Vital, Checksum - wix атрибут, будет поставлен для каждого файлов входящего в данный блок
+
+	Include - Определение набора файлов, которые будут включены в текущий блок (Каталог/Компонент)
+		Атрибуты:
+			Name - Маска имени файлов, по которой будет осуществляться поиск
+			DiskId, Vital, Checksum - переопределение атрибутов в TFiles
+
+-->
+
+<Fragment Id="MyFragment1" Prefix="002"> <!-- Unique prefix for short name files -->
+
+	<TDirectoryRef Id="INSTALLLOCATION" ComponentGroupId="CM_AspComponents">
+
+		<TDirectory Id="Dir1" Name="Directory1" ComponentId="Component1" Guid="3BA67D06-E0A3-4fd5-B39F-FF99CD6ACAE7">
+
+			<TFiles SourceDir="C:\Inetpub\iissamples\sdk\asp\interaction" DiskId="1" Vital="yes" Checksum="no">
+				<Include Name="*.asp"/>
+				<Include Name="*.txt"/>
+			</TFiles>
+
+
+			<TFiles SourceDir="c:\Deployment\Web2" DiskId="1" Vital="yes" Checksum="yes">
+				<Include Name="*.htm?"/>
+			</TFiles>
+
+			<TDirectory Id="SubDir1" Name="SubDirectory1" ComponentId="Component2" Guid="A879BAA7-2DB0-4969-873F-E556CC6CE2BF">
+			</TDirectory>
+
+		</TDirectory>
+
+		<TDirectory Id="Dir2" SourceDir="c:\asp" Name="DirectoryName2" Recursive="yes" KeepEmpty="yes" ComponentId="Component3" Guid="E7071041-80AA-4d69-871E-E2E36A35E86E">
+		
+			<TFiles SourceDir="c:\Deployment\Images" DiskId="1" Vital="yes" Checksum="yes">
+				<Include Name="*.gif"/>
+			</TFiles>
+
+			<Inline>
+				<!-- Some WiX code -->
+				<CreateFolder/>
+			</Inline>
+			
+		</TDirectory>
+
+		<?define aaa="aaa"?>
+		<TDirectoryTree Id="Dir.MyWebSite" SourceDir="c:\release\MyWebSite" Name="MyWebSite" KeepEmpty="yes" ComponentId="CM.MyWebSite" Guid="F126B12A-3FD2-4FA1-8601-D54833A5A4FF">
+		</TDirectoryTree>
+
+
+		<TIncludeComponent Id="OtherComponent" />
+	</TDirectoryRef>
+
+</Fragment>
+</Wix>
