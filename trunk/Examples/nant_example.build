@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<project name="wixgen" default="wixgen" xmlns="http://nant.sf.net/release/0.85-rc3/nant.xsd">
+  <description>
+	WixGen run example
+  </description>
+
+
+  <property name="path.wixgen" value="C:\Projects\MARTI.Setup\__Deploy\Installer.Common\WixGen\bin\Release\wixgen.exe" readonly="true" />
+  <property name="dir.templ" value="C:\Projects\MARTI.Setup\__Deploy\Installer.Common\WixGen\Examples" readonly="true" />
+  <property name="dir.out.wxs" value="C:\Temp\111" readonly="true" />
+
+  <!-- Inc -->
+  <target name="wixgen" description="Generate files">
+
+	<exec program="${path.wixgen}">
+    	<arg value="-outdir" />
+    	<arg value="${dir.out.wxs}" />
+
+    	<arg value="-t" />
+    	<arg value="${dir.templ}\fragment.wxs_t" />
+	</exec>
+
+  </target>
+
+</project>
