@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------------------------------
-// <copyright file="AssemblyInfo.cs" company="SITRONICS Telecom Solutions">
+// <copyright file="AssemblyInfo.cs" company="Alexander Biryukov">
 //    GPL v3
 // </copyright>
 // 
@@ -16,9 +16,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("WiX File Generate Utility")]
 [assembly: AssemblyDescription("Windows Installer XML Toolset File Generate Utility")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("SITRONICS Telecom Solutions")]
-//[assembly: AssemblyProduct("Windows Installer XML Toolset")]
-[assembly: AssemblyCopyright("GPL")]
+[assembly: AssemblyCompany("Alexander Biryukov")]
+[assembly: AssemblyCopyright("GPL v3")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
