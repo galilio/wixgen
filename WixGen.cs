@@ -250,6 +250,143 @@ namespace Sitronics.Installer
 				Console.WriteLine("   -?                  This help information");
 			}
 
+			/// <summary>
+			/// Parse the commandline arguments.
+			/// </summary>
+			/// <param name="args">Commandline arguments.</param>
+			private void ParseCommandLine(string[] args)
+			{
+				for (int i = 0; i < args.Length; ++i)
+				{
+					string arg = args[i];
+					if (String.IsNullOrEmpty(arg)) // skip blank arguments
+					{
+						continue;
+					}
+
+					if ('-' == arg[0] || '/' == arg[0])
+					{
+						if (arg.Length < 2)
+							throw new ArgumentException("Invalid command line", arg);
+
+						string parameter = arg.Substring(1);
+
+						if (parameter[0] == 'D') // -D:<name>=<value>
+						{
+							if (parameter.Length <= 1 || parameter[1] != ':')
+								throw new ArgumentException("Symbol ':' expected at -D parameter");
+
+							parameter = parameter.Substring(2);
+
+							string[] value = parameter.Split("=".ToCharArray(), 2);
+
+							if (value.Length < 1 || value[0].Length <= 0)
+							{
+								throw new ArgumentException("must specify a property name with -D");
+							}
+
+							if (1 == value.Length)
+							{
+								m_properties.Add(value[0], "");
+							}
+							else
+							{
+								m_properties.Add(value[0].Trim(), value[1].Trim());
+							}
+						}
+						else if ("t" == parameter || "template" == parameter) // -t <fileName.wxs_t>
+						{
+							if (args.Length <= ++i || args[i].Length == 0  || '/' == args[i][0] || '-' == args[i][0])
+							{
+								throw new ArgumentException("must specify a template file for parameter -t");
+							}
+
+							m_templateFiles.Add(args[i]);
+						}
+						else if ("outdir" == parameter)
+						{
+							if (args.Length <= ++i || args[i].Length == 0 || '/' == args[i][0] || '-' == args[i][0])
+							{
+								throw new ArgumentException("must specify a directory for parameter -outdir");
+							}
+
+							m_outputDirectory = args[i];
+						}
+						else if ("nologo" == parameter)
+						{
+							m_showLogo = false;
+						}
+						else if ("noexcludes" == parameter)
+						{
+							m_defaultExcludes = false;
+						}
+						else if ("?" == parameter || "help" == parameter)
+						{
+							m_showHelp = true;
+						}
+						else if ("wix3" == parameter)
+						{
+							m_wixVersion = WixVersion.Wix3;
+						}
+						else
+						{
+							throw new ArgumentException("unknown parameter", String.Concat("-", parameter));
+						}
+					}
+					else if ('@' == arg[0])
+					{
+						using (StreamReader reader = new StreamReader(arg.Substring(1)))
+						{
+							string line;
+							ArrayList newArgs = new ArrayList();
+
+							while (null != (line = reader.ReadLine()))
+							{
+								string newArg = "";
+								bool betweenQuotes = false;
+								for (int j = 0; j < line.Length; ++j)
+								{
+									// skip whitespace
+									if (!betweenQuotes && (' ' == line[j] || '\t' == line[j]))
+									{
+										if (!String.IsNullOrEmpty(newArg))
+										{
+											newArgs.Add(newArg);
+											newArg = null;
+										}
+
+										continue;
+									}
+
+									// if we're escaping a quote
+									if ('\\' == line[j] && j < line.Length - 1 && '"' == line[j + 1])
+									{
+										++j;
+									}
+									else if ('"' == line[j]) // if we've hit a new quote
+									{
+										betweenQuotes = !betweenQuotes;
+										continue;
+									}
+
+									newArg = String.Concat(newArg, line[j]);
+								}
+								if (!String.IsNullOrEmpty(newArg))
+								{
+									newArgs.Add(newArg);
+								}
+							}
+							string[] ar = (string[])newArgs.ToArray(typeof(string));
+							ParseCommandLine(ar);
+						}
+					}
+					else
+					{
+						throw new ArgumentException(String.Concat("unexpected argument on command line: ", arg));
+					}
+				}
+			}
+
 			private static void GenError(string format, params object[] args)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -970,144 +1107,6 @@ namespace Sitronics.Installer
 				}
 
 				// Process TFiles
-			}
-
-
-			/// <summary>
-			/// Parse the commandline arguments.
-			/// </summary>
-			/// <param name="args">Commandline arguments.</param>
-			private void ParseCommandLine(string[] args)
-			{
-				for (int i = 0; i < args.Length; ++i)
-				{
-					string arg = args[i];
-					if (String.IsNullOrEmpty(arg)) // skip blank arguments
-					{
-						continue;
-					}
-
-					if ('-' == arg[0] || '/' == arg[0])
-					{
-						if (arg.Length < 2)
-							throw new ArgumentException("Invalid command line", arg);
-
-						string parameter = arg.Substring(1);
-
-						if (parameter[0] == 'D') // -D:<name>=<value>
-						{
-							if (parameter.Length <= 1 || parameter[1] != ':')
-								throw new ArgumentException("Symbol ':' expected at -D parameter");
-
-							parameter = parameter.Substring(2);
-
-							string[] value = parameter.Split("=".ToCharArray(), 2);
-
-							if (value.Length < 1 || value[0].Length <= 0)
-							{
-								throw new ArgumentException("must specify a property name with -D");
-							}
-
-							if (1 == value.Length)
-							{
-								m_properties.Add(value[0], "");
-							}
-							else
-							{
-								m_properties.Add(value[0].Trim(), value[1].Trim());
-							}
-						}
-						else if ("t" == parameter || "template" == parameter) // -t <fileName.wxs_t>
-						{
-							if (args.Length < ++i || '/' == args[i][0] || '-' == args[i][0])
-							{
-								throw new ArgumentException("must specify a template file for parameter -t");
-							}
-
-							m_templateFiles.Add(args[i]);
-						}
-						else if ("outdir" == parameter)
-						{
-							if (args.Length < ++i || '/' == args[i][0] || '-' == args[i][0])
-							{
-								throw new ArgumentException("must specify a directory for parameter -outdir");
-							}
-
-							m_outputDirectory = args[i];
-						}
-						else if ("nologo" == parameter)
-						{
-							m_showLogo = false;
-						}
-						else if ("noexcludes" == parameter)
-						{
-							m_defaultExcludes = false;
-						}
-						else if ("?" == parameter || "help" == parameter)
-						{
-							m_showHelp = true;
-						}
-						else if ("wix3" == parameter)
-						{
-							m_wixVersion = WixVersion.Wix3;
-						}
-						else
-						{
-							throw new ArgumentException("unknown parameter", String.Concat("-", parameter));
-						}
-					}
-					else if ('@' == arg[0])
-					{
-						using (StreamReader reader = new StreamReader(arg.Substring(1)))
-						{
-							string line;
-							ArrayList newArgs = new ArrayList();
-
-							while (null != (line = reader.ReadLine()))
-							{
-								string newArg = "";
-								bool betweenQuotes = false;
-								for (int j = 0; j < line.Length; ++j)
-								{
-									// skip whitespace
-									if (!betweenQuotes && (' ' == line[j] || '\t' == line[j]))
-									{
-										if (!String.IsNullOrEmpty(newArg))
-										{
-											newArgs.Add(newArg);
-											newArg = null;
-										}
-
-										continue;
-									}
-
-									// if we're escaping a quote
-									if ('\\' == line[j] && j < line.Length - 1 && '"' == line[j + 1])
-									{
-										++j;
-									}
-									else if ('"' == line[j]) // if we've hit a new quote
-									{
-										betweenQuotes = !betweenQuotes;
-										continue;
-									}
-
-									newArg = String.Concat(newArg, line[j]);
-								}
-								if (!String.IsNullOrEmpty(newArg))
-								{
-									newArgs.Add(newArg);
-								}
-							}
-							string[] ar = (string[]) newArgs.ToArray(typeof (string));
-							ParseCommandLine(ar);
-						}
-					}
-					else
-					{
-						throw new ArgumentException(String.Concat("unexpected argument on command line: ", arg));
-					}
-				}
 			}
 
 			#region Nested type: FileAttr
